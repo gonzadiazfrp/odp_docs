@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Exportar a Excel</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 2em;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 2em;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    textarea {
+      width: 100%;
+      height: 300px;
+      padding: 1em;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      resize: vertical;
+      font-family: monospace;
+    }
+    button {
+      display: block;
+      margin: 20px auto 0;
+      padding: 10px 25px;
+      background-color: #3498db;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    .notice {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Exportar maestro_especificacion_producto_politica a Excel</h1>
+    <p class="notice">Pega aquí el contenido JSON que recibiste del endpoint <code>/get_maestro_especificacion_producto_politica</code>.</p>
+    <textarea id="jsonInput" placeholder='{"maestro_especificacion_producto_politica": [...]}'>
+    </textarea>
+    <br>
+    <button onclick="exportToExcel()">Exportar a Excel</button>
+  </div>
+
+  <script>
+    function exportToExcel() {
+      try {
+        const input = document.getElementById("jsonInput").value;
+        const jsonData = JSON.parse(input);
+
+        if (!jsonData.maestro_especificacion_producto_politica || !Array.isArray(jsonData.maestro_especificacion_producto_politica)) {
+          alert("El JSON debe contener un array llamado 'maestro_especificacion_producto_politica'");
+          return;
+        }
+
+        const ws = XLSX.utils.json_to_sheet(jsonData.maestro_especificacion_producto_politica);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Maestro");
+
+        XLSX.writeFile(wb, "maestro_especificacion_producto_politica.xlsx");
+      } catch (err) {
+        alert("Error procesando el JSON: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
