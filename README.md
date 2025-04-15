@@ -1,6 +1,13 @@
 # Diagramas y Documentación del proyecto ODP
 
-# 🧠 Clase `OptimizationService` -> 🐍 [ODP_WEB_API]api/application/results/optimization/optimization_service.py
+## Índice
+
+1. [APIs del Modelo](#1-apis-del-modelo)  
+2. [APIs de Datos](#2-apis-de-datos)  
+3. [Visualización de Datos](#3-visualización-de-datos)
+
+## 1. APIs del Modelo
+## 🧠 Clase `OptimizationService` ->  [ODP_WEB_API]api/application/results/optimization/optimization_service.py
 
 La clase `OptimizationService` es el núcleo del sistema de optimización. Se encarga de preparar, ejecutar y procesar los datos necesarios para optimizar recursos/productos en función de restricciones, costos y políticas. La clase OptimizationService es el centro del sistema.
 
@@ -212,8 +219,8 @@ classDiagram
 ```
 
 ---
-
-#  🗃️ app 'FastAPI' -> 🐍 [ODP]api/main_api.py
+## 2. APIs de Datos
+##  🗃️ app 'FastAPI' ->  [ODP]api/main_api.py
 
 ## 🧠 Descripción General
 
@@ -262,4 +269,93 @@ Esta API permite generar los datasets necesarios y ejecutar un modelo de optimiz
   - `ds_integracion_politica`
 - **Uso:** Integra políticas considerando entradas, cuotas y restricciones.
 
+## 3. Visualización de Datos
+## 🧠 [ODP_WEB_API] Trazabilidad y Edición de Gráficos de la App
 
+Este documento describe el flujo de datos y la trazabilidad para los gráficos en el dashboard, así como las instrucciones para su modificación futura.
+
+---
+
+## 🔁 Flujo de datos
+
+1. **Lógica de negocio**
+   - 📄 Archivo: `api/domain/pages/dashboard/production_tons/production_tons_model.py`
+   - Contiene el modelo `ProductionTonsModel` que define los campos de toneladas:
+     - `total_toneladas_con_hueso`
+     - `total_toneladas_sin_hueso`
+     - `total_toneladas_hueso`
+     - ...
+   - Es el punto donde se estructuran los datos a visualizar.
+
+2. **Servicio de implementación**
+   - ⚙️ Archivo: `api/application/pages/dashboard/dashboard_page_service.py`
+   - Método: `get_production_tons(request: Request) -> ProductionTonsModel | None`
+   - Recupera los resultados optimizados (`model_result`) y los transforma en una instancia del modelo.
+   - Esta función alimenta la vista con los datos finales que serán graficados.
+
+3. **Renderizado HTML (Frontend)**
+   - 📁 Archivo: `templates/pages/dashboard/index.html`
+   - Fragmento relevante:
+     ```html
+     <div 
+       hx-get="/api/dashboard/get_production_tons_graph/"
+       hx-trigger="intersect once, modelExecuted from:body, sessionLoaded from:body"
+       hx-swap="innerHTML"
+       class="h-[566px] bg-white overflow-hidden rounded-md"
+     >
+       <div>Cargando...</div>
+       <span class="loading loading-spinner text-primary"></span>
+     </div>
+     ```
+   - Usa **HTMX** para hacer una solicitud al endpoint `/api/dashboard/get_production_tons_graph/`.
+   - Este endpoint devuelve un fragmento HTML con una imagen renderizada del gráfico.
+
+4. **Parcial HTML del gráfico**
+   - 📄 Fragmento (ej. `partials/_production_tons_graph.html`)
+   - Renderiza la imagen del gráfico como:
+     ```html
+     <img src="data:image/png;base64,{{ result.graph_base64 }}" alt="Gráfico de producción">
+     ```
+
+---
+
+## 🎯 Cómo modificar el gráfico
+
+### 1. Estilo visual desde el **HTML**
+- Se puede modificar la presentación del gráfico (bordes, tamaño, espaciado, etc.) en `index.html` o el parcial.
+- Ejemplo:
+  ```html
+  <img
+    src="data:image/png;base64,{{ result.graph_base64 }}"
+    class="w-full rounded-md shadow-lg border border-gray-200"
+    alt="Gráfico de producción"
+  >
+
+### 2. Contenido del gráfico (colores, tipos, leyendas, ejes, etc.)
+
+❗ **Se modifica desde el backend**, en el método que genera el gráfico  
+(probablemente en `dashboard_page_service.py` o en algún módulo relacionado con gráficos).
+
+Buscá una función que utilice **matplotlib**, **plotly** u otra librería para renderizar el gráfico y convertirlo en una imagen `base64`.
+
+### Podés cambiar:
+- Colores de barras
+- Tipo de gráfico
+- Títulos, leyendas, etiquetas
+- Estilo de fuentes, tamaños, alineación
+
+---
+
+## 🧪 Verificación y Debugging
+
+Para verificar que el gráfico se actualiza correctamente:
+
+1. Ejecutar una sesión desde el dashboard.
+2. Observar que se active el request:  
+   `hx-get="/api/dashboard/get_production_tons_graph/"`
+3. Confirmar que la imagen se actualiza con los nuevos datos.
+
+Si la imagen **no** cambia:
+
+- Verificar que el objeto `model_result` se esté actualizando correctamente.
+- Asegurarse de que el gráfico se genere nuevamente en cada solicitud.
