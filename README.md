@@ -5,6 +5,7 @@
 1. [APIs del Modelo](#1-apis-del-modelo)  
 2. [APIs de Datos](#2-apis-de-datos)  
 3. [Visualización de Datos](#3-visualización-de-datos)
+4. [Gestor de Políticas](#4-gestor_de_políticas)
 
 ## 1. APIs del Modelo
 ## 🧠 Clase `OptimizationService` ->  [ODP_WEB_API]api/application/results/optimization/optimization_service.py
@@ -359,3 +360,168 @@ Si la imagen **no** cambia:
 
 - Verificar que el objeto `model_result` se esté actualizando correctamente.
 - Asegurarse de que el gráfico se genere nuevamente en cada solicitud.
+
+---
+## 4. Gestor de Políticas (Policy Modal)
+
+Este documento describe el funcionamiento completo del **Gestor de Políticas** en la aplicación, incluyendo el flujo de datos, la interacción entre el frontend y el backend, y los archivos involucrados.
+
+---
+
+## 📁 Archivos Involucrados
+
+| Archivo                        | Rol Principal |
+|-------------------------------|---------------|
+| `router.py`                   | Lógica de backend, carga y actualización de datos |
+| `_policy_modal.html`          | Contenedor del modal HTML |
+| `_policy_modal_content.html`  | Contenido del modal con formularios y datos |
+| `policy_modal.js`             | Lógica dinámica (eventos, validaciones, AJAX) |
+
+---
+
+## 🔄 Flujo de Funcionamiento
+
+### 1. Apertura del Modal
+
+- Desde el frontend, un botón (o acción) hace una solicitud a Django para abrir el modal de políticas.
+- El contenido se carga dinámicamente usando **HTMX** y se inyecta en el `div` con ID `policy_modal_content`.
+
+
+```html
+<dialog id="policy_modal">
+  <div id="policy_modal_content">
+    <!-- Aquí se inyecta _policy_modal_content.html -->
+  </div>
+</dialog>
+```
+
+---
+
+## 🔁 2. Backend: `router.py`
+
+### 🔧 Función: `_prepare_policy_modal_data(request, pk)`
+- Si `pk` es `None`, crea una política vacía.
+- Si `pk` está definido, obtiene la política existente y sus relaciones:
+  - Calidad de Hacienda
+  - Cuarto
+  - Entrada
+  - Productos relacionados
+
+También obtiene:
+- Todos los cuartos (`all_cuartos`)
+- Todas las entradas (`all_entradas`)
+- Todas las calidades (`all_calidades`)
+- Todos los destinos, productos y especificaciones
+
+---
+
+### 🌐 Función: `_render_policy_modal(data)`
+- Usa el contexto preparado para renderizar el HTML parcial: `_policy_modal_content.html`
+
+---
+
+### ✅ Guardado: `_full_policy_update(payload, pk)`
+- Valida datos de política y productos.
+- Verifica que el rendimiento total coincida con el rendimiento de entrada.
+- Actualiza o crea registros en la base de datos.
+
+---
+
+## 💻 3. Contenedor Modal: `_policy_modal.html`
+
+- Contiene el `<dialog>` con `id="policy_modal"`.
+- Escucha eventos `htmx:afterSwap` para abrir el modal cuando el contenido es cargado.
+- Usa JS embebido para cerrar el modal, y lanzar el trigger personalizado `modalClosed`.
+
+---
+
+## 🧱 4. Contenido del Modal: `_policy_modal_content.html`
+
+- Usa variables inyectadas desde Django (`{{ policy.nombre_politica }}`, etc.).
+- Contiene:
+  - Formulario de política
+  - Selects dinámicos
+  - Tabla con productos relacionados
+  - Botones para guardar, filtrar, agregar productos, borrar selección
+
+Incluye JS inline para:
+- Validación de campos
+- Activación del botón “Guardar” cuando hay cambios
+- Cálculo de rendimiento total
+
+---
+
+## ⚙️ 5. Frontend JS: `policy_modal.js`
+
+Controla toda la lógica interactiva del modal:
+
+### ✅ Cargar Modal
+```js
+document.body.addEventListener('htmx:afterSwap', function (event) {
+  if (event.detail.target.id === 'policy_modal_content') {
+    initializeTable(); // carga la tabla
+  }
+});
+```
+
+---
+
+### ✅ Guardar Cambios
+```js
+fetch(`/api/politicas/${policyId}/update_policy/`, {
+  method: 'PUT',
+  body: JSON.stringify({ policy, products })
+});
+```
+
+- Recoge datos del formulario.
+- Valida que existan productos válidos.
+- Muestra errores con `showToast()` o `alert()`.
+- Cierra el modal y refresca vista si todo sale bien.
+
+---
+
+### ❌ Eliminar Productos
+```js
+fetch(`/api/politicas/${policyId}/delete_products/`, {
+  method: 'DELETE',
+  body: formData
+});
+```
+
+---
+
+### 📊 Calcular Rendimiento Total
+```js
+function recalculateTotalRendimiento() {
+  // Suma los valores de los inputs .rendimiento-field
+}
+```
+
+---
+
+### ➕ Agregar Fila de Producto
+- Inserta una nueva fila con selects vacíos y campos listos para completar.
+
+---
+
+## 🧩 Datos Importantes
+
+- Todos los `select`, `input`, y `checkboxes` están marcados con clases `.policy-field` o `.product-field`.
+- El botón "Guardar" se activa solo cuando hay cambios detectados.
+- HTMX facilita las actualizaciones parciales sin recargar toda la página.
+
+---
+
+## ✅ Validaciones Clave
+
+### Backend
+- Valida:
+  - Campos obligatorios (nombre, cuarto, entrada, etc.)
+  - Que el rendimiento total de productos coincida con el de entrada
+
+### Frontend
+- Bloquea acción si:
+  - Faltan campos requeridos
+  - No hay productos agregados
+  - Hay errores de red o formato
