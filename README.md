@@ -1,11 +1,37 @@
 # Diagramas y Documentación del proyecto ODP
 
+```mermaid
+graph TD
+    VISTA["🧾 especificacion_producto_politica_view.py"]
+    SERVICIO["⚙️ EspecificacionProductoPoliticaService"]
+    REPOSITORIO["📦 EspecificacionProductoRepository"]
+    SESSION_REPO["💾 DjangoSessionRepository"]
+    FUENTE_DATOS["🌐 specs_view (DB o microservicio)"]
+
+    VISTA -->|usa| SERVICIO
+    SERVICIO -->|usa| REPOSITORIO
+    SERVICIO -->|usa| SESSION_REPO
+    SESSION_REPO -->|lee/escribe| Datos_en_la_sesion
+    REPOSITORIO -->|consulta| FUENTE_DATOS
+
+
+```
+
+| Nodo                                   | Rol                                                               |
+|----------------------------------------|-------------------------------------------------------------------|
+| `especificacion_producto_politica_view.py` | Vista o endpoint que maneja la petición del usuario               |
+| `EspecificacionProductoPoliticaService`  | Lógica de negocio: decide si usar caché o ir al repo              |
+| `EspecificacionProductoRepository`      | Encapsula acceso a datos (DB, query a `specs_view`, etc.)         |
+| `DjangoSessionRepository`               | Guarda/recupera los datos en la sesión del usuario               |
+| `specs_view`                           | Fuente de los datos reales (una vista en la DB)                  |
+
+
 ## Índice
 
 1. [APIs del Modelo](#1-apis-del-modelo)  
 2. [APIs de Datos](#2-apis-de-datos)  
 3. [Visualización de Datos](#3-visualización-de-datos)
-4. [Gestor de Políticas](#4-gestor_de_políticas)
+4. [Gestor de Políticas](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#4-gestor-de-pol%C3%ADticas-policy-modal)
 
 ## 1. APIs del Modelo
 ## 🧠 Clase `OptimizationService` ->  [ODP_WEB_API]api/application/results/optimization/optimization_service.py
