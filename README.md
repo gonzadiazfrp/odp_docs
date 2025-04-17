@@ -1,40 +1,73 @@
 # Diagramas y Documentación del proyecto ODP
 
-```mermaid
-graph TD
-    VISTA["🧾 especificacion_producto_politica_view.py"]
-    SERVICIO["⚙️ EspecificacionProductoPoliticaService"]
-    REPOSITORIO["📦 EspecificacionProductoRepository"]
-    SESSION_REPO["💾 DjangoSessionRepository"]
-    FUENTE_DATOS["🌐 specs_view (DB o microservicio)"]
-
-    VISTA -->|usa| SERVICIO
-    SERVICIO -->|usa| REPOSITORIO
-    SERVICIO -->|usa| SESSION_REPO
-    SESSION_REPO -->|lee/escribe| Datos_en_la_sesion
-    REPOSITORIO -->|consulta| FUENTE_DATOS
-
-
-```
-
-| Nodo                                   | Rol                                                               |
-|----------------------------------------|-------------------------------------------------------------------|
-| `especificacion_producto_politica_view.py` | Vista o endpoint que maneja la petición del usuario               |
-| `EspecificacionProductoPoliticaService`  | Lógica de negocio: decide si usar caché o ir al repo              |
-| `EspecificacionProductoRepository`      | Encapsula acceso a datos (DB, query a `specs_view`, etc.)         |
-| `DjangoSessionRepository`               | Guarda/recupera los datos en la sesión del usuario               |
-| `specs_view`                           | Fuente de los datos reales (una vista en la DB)                  |
-
-
 ## Índice
 
-1. [APIs del Modelo](#1-apis-del-modelo)  
-2. [APIs de Datos](#2-apis-de-datos)  
-3. [Visualización de Datos](#3-visualización-de-datos)
-4. [Gestor de Políticas](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#4-gestor-de-pol%C3%ADticas-policy-modal)
+1. [Descripción técnica del flujo de datos](#descripcion-tecnica-del-flujo-de-datos)
+2. [APIs del Modelo](#apis-del-modelo)
+3. [APIs de Datos](#apis-de-datos)
+4. [Gestor de Políticas (Policy Modal)](#gestor-de-politicas-policy-modal)
 
-## 1. APIs del Modelo
-## 🧠 Clase `OptimizationService` ->  [ODP_WEB_API]api/application/results/optimization/optimization_service.py
+
+
+---
+# Descripción técnica del flujo de datos
+Los datos visualizados en los componentes del dashboard (gráficas, tablas, reportes) no se obtienen directamente desde la base de datos relacional (PostgreSQL). En su lugar, estos datos son el resultado de un proceso de ejecución del modelo de optimización, el cual realiza transformaciones e inferencias a partir de ciertos datos de entrada.
+
+El flujo de datos funciona de la siguiente manera:
+
+- Origen de datos del modelo: el modelo se alimenta de datos estructurados que sí provienen desde la base de datos, en particular desde la vista specs_view/entidades.
+
+- Procesamiento: el modelo se ejecuta mediante el componente OptimizationService, el cual orquesta la lógica de inferencia y procesamiento.
+
+- Persistencia temporal: los resultados de dicha ejecución no se guardan en la base de datos. En cambio, son almacenados en estructuras de sesión (OptimizationSession, DjangoSessionRepository) para mantener su disponibilidad en la capa de presentación durante la sesión activa del usuario.
+
+- Acceso y visualización: estos resultados procesados se acceden a través de Django, utilizando repositorios de sesión, y son finalmente renderizados en el front-end (index.html) como parte del dashboard.
+
+- Este enfoque desacopla el almacenamiento permanente del ciclo de visualización, lo cual permite mantener el sistema más liviano, rápido y centrado en la experiencia del usuario final
+
+```mermaid
+graph TD
+    VISTA["📊 index.html"]
+    SERVICIO["⚙️ Router"]
+    DJ_SESSION_REPO["💾 DjangoSessionRepository"]
+    FUENTE_DATOS["🌐 specs_view/entidades (Base de Datos PostgreSQL)"]
+    SESSION_REPO["🔐SessionRepository"]
+
+    subgraph ODP["🚀 Ejecución Modelo"]
+        OPT_SERVICE[" 🧠 OptimizationService"]
+        REPOSITORIO_DB["📦 PostgresRepository"]
+        OPT_SESSION["📊 APIOptimizationRepository"]
+        OPT_SERVICE --> REPOSITORIO_DB
+        OPT_SERVICE --> OPT_SESSION
+    end
+
+    VISTA --> SERVICIO
+    SERVICIO --> OPT_SERVICE
+    OPT_SERVICE --> SESSION_REPO
+    SERVICIO --> DJ_SESSION_REPO
+    DJ_SESSION_REPO -->|métodos set/get| SESSION_REPO
+    REPOSITORIO_DB --> FUENTE_DATOS
+
+```
+---
+
+
+| Nodo                          | Rol                                                                 |
+|-------------------------------|----------------------------------------------------------------------|
+| `index.html`                  | 📊 Interfaz frontend encargada de visualizar gráficos y reportes del dashboard. |
+| `Router`                      | ⚙️ Punto de entrada REST que orquesta las llamadas API hacia los servicios backend. |
+| `DjangoSessionRepository`     | 💾 Repositorio que persiste datos en la sesión actual del usuario utilizando mecanismos de Django. |
+| `SessionRepository`           | 🔐 Interfaz o abstracción que define los métodos de acceso a datos de sesión (get/set). |
+| `specs_view/entidades`        | 🌐 Vista de base de datos PostgreSQL que expone los datos base necesarios para ejecutar el modelo. |
+| `OptimizationService`         | 🧠 Servicio que ejecuta la lógica principal del modelo de optimización e integra múltiples componentes. |
+| `PostgresRepository`          | 📦 Repositorio encargado de consultar directamente la base de datos relacional para alimentar el modelo. |
+
+
+
+# 1. APIs del Modelo
+## 🧠 Clase `OptimizationService` 
+
+- api/application/results/optimization/optimization_service.py
 
 La clase `OptimizationService` es el núcleo del sistema de optimización. Se encarga de preparar, ejecutar y procesar los datos necesarios para optimizar recursos/productos en función de restricciones, costos y políticas. La clase OptimizationService es el centro del sistema.
 
@@ -246,8 +279,10 @@ classDiagram
 ```
 
 ---
-## 2. APIs de Datos
-##  🗃️ app 'FastAPI' ->  [ODP]api/main_api.py
+# 2. APIs de Datos
+##  🗃️ app 'FastAPI' 
+
+- api/main_api.py
 
 ## 🧠 Descripción General
 
@@ -256,7 +291,7 @@ Esta API permite generar los datasets necesarios y ejecutar un modelo de optimiz
 ---
 ## 📌 Endpoints Clave
 
-### 🔹 `/get_maestro_especificacion_producto_politica`
+### 🔹 get_maestro_especificacion_producto_politica
 
 - **Método:** `POST`
 - **Input:** 
@@ -269,7 +304,7 @@ Esta API permite generar los datasets necesarios y ejecutar un modelo de optimiz
 
 ---
 
-### 🔹 `/get_ds_producto_politica_cuota`
+### 🔹 get_ds_producto_politica_cuota
 
 - **Método:** `POST`
 - **Input:**
@@ -284,7 +319,7 @@ Esta API permite generar los datasets necesarios y ejecutar un modelo de optimiz
 
 ---
 
-### 🔹 `/get_ds_integracion_politica`
+### 🔹 get_ds_integracion_politica
 
 - **Método:** `POST`
 - **Input:**
@@ -296,8 +331,8 @@ Esta API permite generar los datasets necesarios y ejecutar un modelo de optimiz
   - `ds_integracion_politica`
 - **Uso:** Integra políticas considerando entradas, cuotas y restricciones.
 
-## 3. Visualización de Datos
-## 🧠 [ODP_WEB_API] Trazabilidad y Edición de Gráficos de la App
+# 3. Visualización de Datos
+## 🧠 Trazabilidad y Edición de Gráficos de la App
 
 Este documento describe el flujo de datos y la trazabilidad para los gráficos en el dashboard, así como las instrucciones para su modificación futura.
 
@@ -388,7 +423,7 @@ Si la imagen **no** cambia:
 - Asegurarse de que el gráfico se genere nuevamente en cada solicitud.
 
 ---
-## 4. Gestor de Políticas (Policy Modal)
+# 4. Gestor de Políticas (Policy Modal)
 
 Este documento describe el funcionamiento completo del **Gestor de Políticas** en la aplicación, incluyendo el flujo de datos, la interacción entre el frontend y el backend, y los archivos involucrados.
 
