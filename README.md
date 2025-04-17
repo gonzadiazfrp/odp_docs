@@ -2,10 +2,11 @@
 
 ## Índice
 
-1. [Descripción técnica del flujo de datos](#descripcion-tecnica-del-flujo-de-datos)
-2. [APIs del Modelo](#apis-del-modelo)
-3. [APIs de Datos](#apis-de-datos)
-4. [Gestor de Políticas (Policy Modal)](#gestor-de-politicas-policy-modal)
+1. [Descripción técnica del flujo de datos](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#descripci%C3%B3n-t%C3%A9cnica-del-flujo-de-datos)
+2. [APIs del Modelo](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#2-apis-de-datos)
+3. [APIs de Datos](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#3-visualizaci%C3%B3n-de-datos)
+4. [Visualización de Datos](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#3-visualizaci%C3%B3n-de-datos)
+5. [Gestor de Políticas (Policy Modal)](#gestor-de-politicas-policy-modal)
 
 
 
@@ -332,6 +333,7 @@ Esta API permite generar los datasets necesarios y ejecutar un modelo de optimiz
 - **Uso:** Integra políticas considerando entradas, cuotas y restricciones.
 
 # 3. Visualización de Datos
+
 ## 🧠 Trazabilidad y Edición de Gráficos de la App
 
 Este documento describe el flujo de datos y la trazabilidad para los gráficos en el dashboard, así como las instrucciones para su modificación futura.
@@ -408,7 +410,7 @@ Buscá una función que utilice **matplotlib**, **plotly** u otra librería para
 
 ---
 
-## 🧪 Verificación y Debugging
+### 🧪 Verificación y Debugging
 
 Para verificar que el gráfico se actualiza correctamente:
 
@@ -423,13 +425,13 @@ Si la imagen **no** cambia:
 - Asegurarse de que el gráfico se genere nuevamente en cada solicitud.
 
 ---
-# 4. Gestor de Políticas (Policy Modal)
+# 5. Gestor de Políticas (Policy Modal)
 
 Este documento describe el funcionamiento completo del **Gestor de Políticas** en la aplicación, incluyendo el flujo de datos, la interacción entre el frontend y el backend, y los archivos involucrados.
 
 ---
 
-## 📁 Archivos Involucrados
+### 📁 Archivos Involucrados
 
 | Archivo                        | Rol Principal |
 |-------------------------------|---------------|
@@ -440,7 +442,7 @@ Este documento describe el funcionamiento completo del **Gestor de Políticas** 
 
 ---
 
-## 🔄 Flujo de Funcionamiento
+### 🔄 Flujo de Funcionamiento
 
 ### 1. Apertura del Modal
 
@@ -458,7 +460,7 @@ Este documento describe el funcionamiento completo del **Gestor de Políticas** 
 
 ---
 
-## 🔁 2. Backend: `router.py`
+### 🔁 2. Backend: `router.py`
 
 ### 🔧 Función: `_prepare_policy_modal_data(request, pk)`
 - Si `pk` es `None`, crea una política vacía.
@@ -488,7 +490,7 @@ También obtiene:
 
 ---
 
-## 💻 3. Contenedor Modal: `_policy_modal.html`
+### 💻 3. Contenedor Modal: `_policy_modal.html`
 
 - Contiene el `<dialog>` con `id="policy_modal"`.
 - Escucha eventos `htmx:afterSwap` para abrir el modal cuando el contenido es cargado.
@@ -496,7 +498,7 @@ También obtiene:
 
 ---
 
-## 🧱 4. Contenido del Modal: `_policy_modal_content.html`
+### 🧱 4. Contenido del Modal: `_policy_modal_content.html`
 
 - Usa variables inyectadas desde Django (`{{ policy.nombre_politica }}`, etc.).
 - Contiene:
@@ -512,7 +514,7 @@ Incluye JS inline para:
 
 ---
 
-## ⚙️ 5. Frontend JS: `policy_modal.js`
+### ⚙️ 5. Frontend JS: `policy_modal.js`
 
 Controla toda la lógica interactiva del modal:
 
@@ -566,7 +568,7 @@ function recalculateTotalRendimiento() {
 
 ---
 
-## 🧩 Datos Importantes
+#### 🧩 Datos Importantes
 
 - Todos los `select`, `input`, y `checkboxes` están marcados con clases `.policy-field` o `.product-field`.
 - El botón "Guardar" se activa solo cuando hay cambios detectados.
@@ -574,7 +576,7 @@ function recalculateTotalRendimiento() {
 
 ---
 
-## ✅ Validaciones Clave
+### ✅ Validaciones Clave
 
 ### Backend
 - Valida:
