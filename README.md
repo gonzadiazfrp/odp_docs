@@ -2,11 +2,107 @@
 
 ## Índice
 
-1. [Descripción técnica del flujo de datos](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#descripci%C3%B3n-t%C3%A9cnica-del-flujo-de-datos)
-2. [APIs del Modelo](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#2-apis-de-datos)
-3. [APIs de Datos](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#3-visualizaci%C3%B3n-de-datos)
-4. [Visualización de Datos](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#3-visualizaci%C3%B3n-de-datos)
-5. [Gestor de Políticas (Policy Modal)](#gestor-de-politicas-policy-modal)
+1. [Entorno de Desarollo FrontEnd]()
+2. [Descripción técnica del flujo de datos](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#descripci%C3%B3n-t%C3%A9cnica-del-flujo-de-datos)
+3. [APIs del Modelo](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#2-apis-de-datos)
+4. [APIs de Datos](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#3-visualizaci%C3%B3n-de-datos)
+5. [Visualización de Datos](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#3-visualizaci%C3%B3n-de-datos)
+6. [Gestor de Políticas (Policy Modal)](#gestor-de-politicas-policy-modal)
+
+---
+# Entorno de Desarollo FrontEnd
+
+### 1. Instalación de Dependencias
+
+#### Python Dependencias
+```bash
+pip install -r requirements.txt
+```
+**Explicación**: Este comando instala todas las dependencias de Python listadas en el archivo `requirements.txt`. Este archivo contiene los nombres y versiones de los paquetes necesarios para que el proyecto funcione correctamente. Herramienta necesaria: **pip** (gestor de paquetes de Python).
+
+#### Node.js Dependencias
+```bash
+npm install
+```
+**Explicación**: Este comando instala todas las dependencias de Node.js listadas en el archivo `package.json`. Estas dependencias son necesarias para el desarrollo del frontend del proyecto. Herramienta necesaria: **npm** (gestor de paquetes de Node.js).
+
+### 2. Ejecutar Migraciones de Django
+
+Antes de ejecutar las migraciones, necesitas tener el archivo `.env` en la raíz del proyecto y la base de datos PostgreSQL instalada y funcionando. Contacta al gestor del proyecto para obtener el archivo `.env`.
+
+#### Crear Migraciones
+```bash
+python manage.py makemigrations
+```
+**Explicación**: Este comando crea archivos de migración basados en los cambios realizados en los modelos de Django. Estos archivos de migración son utilizados para aplicar cambios en la estructura de la base de datos.
+
+#### Aplicar Migraciones
+```bash
+python manage.py migrate
+```
+**Explicación**: Este comando aplica las migraciones a la base de datos, creando o modificando las tablas según los modelos definidos en el proyecto. Herramienta necesaria: **Django** (framework web de Python).
+
+### 3. Ejecutar el Servidor de Desarrollo de Django
+
+```bash
+python manage.py runserver
+```
+**Explicación**: Este comando inicia el servidor de desarrollo de Django, permitiéndote ver y probar el proyecto localmente. Por defecto, el servidor se ejecuta en el puerto 8000. Herramienta necesaria: **Django**.
+
+### 4. Compilar Estilos con TailwindCSS y DaisyUI
+
+```bash
+npm run build:css
+```
+**Explicación**: Este comando utiliza `npx tailwindcss` para compilar los estilos de TailwindCSS y DaisyUI. El archivo `input.css` se convierte en `styles.css`, y el modo de vigilancia (`watch mode`) se activa para recompilar los estilos cada vez que se realicen cambios en el código. Herramientas necesarias: **TailwindCSS** y **DaisyUI**.
+
+### Salida Esperada
+
+```bash
+(base) ➜  odp-web-api git:(dev) npm run build:css              
+
+> build:css
+> npx tailwindcss -i ./static/input.css -o ./static/styles.css --watch
+
+Rebuilding...
+
+🌼   daisyUI 4.12.14
+├─ ✔︎ 1 theme added              https://daisyui.com/docs/themes
+╰─ ★ Star daisyUI on GitHub     https://github.com/saadeghi/daisyui
+
+Done in 452ms.
+```
+**Explicación**: Este mensaje indica que los estilos se han compilado correctamente y que el modo de vigilancia está activo. Deja este proceso corriendo mientras trabajas en el proyecto y abre otra ventana de terminal para ejecutar el servidor de desarrollo de Django.
+
+### Herramientas Necesarias
+
+1. **Python**: Lenguaje de programación utilizado para el backend.
+2. **pip**: Gestor de paquetes de Python.
+3. **Django**: Framework web de Python.
+4. **PostgreSQL**: Base de datos relacional.
+5. **Node.js**: Entorno de ejecución de JavaScript.
+6. **npm**: Gestor de paquetes de Node.js.
+7. **TailwindCSS**: Framework de CSS.
+8. **DaisyUI**: Biblioteca de componentes UI basada en TailwindCSS.
+
+### Resumen de Pasos
+
+1. **Instalar dependencias**:
+   - `pip install -r requirements.txt`
+   - `npm install`
+2. **Ejecutar migraciones de Django**:
+   - `python manage.py makemigrations`
+   - `python manage.py migrate`
+3. **Ejecutar el servidor de desarrollo de Django**:
+   - `python manage.py runserver`
+4. **Compilar estilos con TailwindCSS y DaisyUI**:
+   - `npm run build:css`
+
+Siguiendo estos pasos, deberías tener el entorno de desarrollo configurado y el proyecto corriendo localmente.
+
+
+
+
 
 
 
