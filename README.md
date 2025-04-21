@@ -2,12 +2,12 @@
 
 ## Índice
 
-1. [Entorno de Desarollo FrontEnd](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#entorno-de-desarollo-frontend)
-2. [Descripción técnica del flujo de datos](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#descripci%C3%B3n-t%C3%A9cnica-del-flujo-de-datos)
-3. [APIs del Modelo](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#2-apis-de-datos)
-4. [APIs de Datos](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#3-visualizaci%C3%B3n-de-datos)
-5. [Visualización de Datos](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#3-visualizaci%C3%B3n-de-datos)
-6. [Gestor de Políticas (Policy Modal)](#gestor-de-politicas-policy-modal)
+[Entorno de Desarollo FrontEnd](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#entorno-de-desarollo-frontend)
+1. [Descripción técnica del flujo de datos](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#descripci%C3%B3n-t%C3%A9cnica-del-flujo-de-datos)
+2. [APIs del Modelo](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#2-apis-de-datos)
+3. [APIs de Datos](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#3-visualizaci%C3%B3n-de-datos)
+4. [Visualización de Datos](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#3-visualizaci%C3%B3n-de-datos)
+5. [Gestor de Políticas (Policy Modal)](https://github.com/gonzadiazfrp/odp_docs?tab=readme-ov-file#5-gestor-de-pol%C3%ADticas-policy-modal)
 
 ---
 # Entorno de Desarollo FrontEnd
