@@ -521,6 +521,44 @@ Si la imagen **no** cambia:
 - Asegurarse de que el gráfico se genere nuevamente en cada solicitud.
 
 ---
+# 4. Cambios en KPIs
+
+Flujo de datos para `metricas_insumos_generales`:
+
+1. **Origen de los datos:**
+   - Los datos provienen de una API de optimización que calcula las métricas de insumos.
+   - La clase `APIOptmizationRepository` procesa estos datos del modelo de optimización.
+
+2. **Estructura de los datos:**
+   - Los datos se almacenan en la clase `MetricasInsumosGenerales` que tiene dos campos:
+   ```python
+   class MetricasInsumosGenerales(BaseModel):
+       total_bolsas_necesarias: float
+       total_cajas_necesarias: float
+   ```
+
+3. **Flujo de los datos:**
+   1. El repositorio `APIOptmizationRepository` obtiene los datos del modelo de optimización
+   2. Los datos pasan al servicio `DashboardPageService` a través del método `get_metricas_insumos()`
+   3. El controlador `DashboardAPIRouter` expone un endpoint `/api/dashboard/get_metricas_insumos_generales/`
+   4. Este endpoint renderiza el template `_insumos_metrics_general.html` con los datos
+
+4. **Visualización:**
+   - Los datos se muestran en el dashboard en dos tarjetas:
+     - Total de bolsas necesarias
+     - Total de cajas necesarias
+   - Los valores se redondean hacia arriba usando el filtro `ceil`
+
+5. **Acceso a los datos:**
+   - Los datos se actualizan cuando:
+     - Se carga la página (`load`)
+     - Se ejecuta el modelo (`modelExecuted`)
+     - Se carga una sesión (`sessionLoaded`)
+
+En resumen, `metricas_insumos_generales` es parte de un sistema más grande que calcula y muestra las necesidades de insumos (bolsas y cajas) basado en los resultados de un modelo de optimización.
+
+---
+
 # 5. Gestor de Políticas (Policy Modal)
 
 Este documento describe el funcionamiento completo del **Gestor de Políticas** en la aplicación, incluyendo el flujo de datos, la interacción entre el frontend y el backend, y los archivos involucrados.
